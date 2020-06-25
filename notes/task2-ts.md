@@ -1,5 +1,7 @@
 # 1. ts 的学习大纲 https://juejin.im/post/5edd8ad8f265da76fc45362c#heading-28
 
+https://i.51job.com/resume/standard_resume.php?lang=c&resumeid=356585555&0.16130746229826243
+
 ![avatar](../images/ts学习大纲.png)
 
 # 1.1 TypeScript 是什么
@@ -78,7 +80,7 @@ let n: null = null;
 let s: symbol = Symbol.for("abc");
 ```
 
-## 2.6 Object 类型
+## 2.6 Object 类型 https://juejin.im/post/5ecef4466fb9a047d5645254
 
 ## 2.7 Array 类型
 
@@ -524,3 +526,189 @@ console.log(calculator.add(20, " Semlinker"));
 ```
 
 这里需要注意的是，当 TypeScript 编译器处理函数重载时，它会查找重载列表，尝试使用第一个重载定义。 如果匹配的话就使用这个。 因此，在定义重载的时候，一定要把最精确的定义放在最前面。另外在 Calculator 类中，add(a: Combinable, b: Combinable){ } 并不是重载列表的一部分，因此对于 add 成员方法来说，我们只定义了四个重载方法。
+
+# 5. interface 接口
+
+在面向对象语言中，接口是一个很重要的概念，它是对行为的抽象，而具体如何行动需要由类去实现
+
+TypeScript 中的[接口](https://ts.xcatliu.com/advanced/class-and-interfaces.html#%E7%B1%BB%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3)是一个非常灵活的概念，除了可用于对类的一部分行为进行抽象以外，也常用于对「对象的形状（Shape）」进行描述。
+
+## 5.1 对象的形状
+
+```js
+// 定义Person接口，接口里面有name和age属性
+interface Person {
+  name: string;
+  age: 20;
+}
+
+// 实现了 Person接口，就必须实现它内部的成员(name和age)，不然会编译不通过
+let stu: Person = {
+  name: "lisi",
+  age: 20,
+};
+```
+
+## 5.2 可选 | 只读属性
+
+```js
+// 定义了一个Person接口，并且有个只读的name属性和一个可选的age属性
+interface Person {
+  readonly name: string;
+  age?: number;
+}
+
+// stu对象实现了Person接口，并且实现了name只读属性，age属性可选
+let stu: Person = {
+  name: "1234",
+};
+
+// stu.name = 123;          // 只读属性name不能修改否则会编译报错
+console.log(stu);
+```
+
+只读属性用于限制只能在对象刚刚创建的时候修改其值。此外 TypeScript 还提供了 ReadonlyArray<T> 类型，它与 Array<T> 相似，只是把所有可变方法去掉了，因此可以确保数组创建后再也不能被修改。
+
+```js
+let arr: number[] = [1, 2, 3, 4];
+let readonlyArr: ReadonlyArray<number> = arr;
+// readonlyArr[0] = 12; // error!
+// readonlyArr.push(5); // error!
+// readonlyArr.length = 100; // error!
+// arr = readonlyArr; // error!
+```
+
+# 6. class
+
+## 6.1 类的属性和方法
+
+在面向对象语言中，类是一种面向对象计算机编程语言的构造，是创建对象的蓝图，描述了所创建的对象共同的属性和方法。
+
+在 TypeScript 中，我们可以通过 <font color="red">Class</font> 关键字来定义一个类：
+
+```js
+// 创建Person类
+class Person {
+  // 实例属性
+  name: string; // 声明name属性的类型
+
+  // 静态属性
+  static sname: string = "person";
+
+  constructor(name: string) {
+    this.name = name; // 前提条件必须先声明此属性的类型
+  }
+
+  // 静态方法
+  static sayStatic(): void {
+    console.log(`hello ${Person.sname}`);
+  }
+
+  // 实例方法
+  say() {
+    console.log(`hello ${this.name}`);
+  }
+}
+
+let person = new Person("lisi");
+person.say();
+Person.sayStatic();
+```
+
+那么成员属性与静态属性，成员方法与静态方法有什么区别呢？这里无需过多解释，我们直接看一下以下编译生成的 ES5 代码：
+
+```js
+"use strict";
+// 创建Person类
+var Person = /** @class */ (function () {
+  function Person(name) {
+    this.name = name; // 前提条件必须先声明此属性的类型
+  }
+  // 静态方法
+  Person.sayStatic = function () {
+    console.log("hello " + Person.sname);
+  };
+  // 实例方法
+  Person.prototype.say = function () {
+    console.log("hello " + this.name);
+  };
+  // 静态属性
+  Person.sname = "person";
+  return Person;
+})();
+var person = new Person("lisi");
+person.say();
+Person.sayStatic();
+```
+
+成员属性只能是实例对象访问，静态属性只能是类访问
+
+## 6.2 访问器
+
+在 TypeScript 中，我们可以通过 getter 和 setter 方法来实现数据的封装和有效性校验，防止出现异常数据。
+
+```js
+class Employee {
+  // private关键词，只能在自己类访问
+  private _age: number = 0; // 私有属性，外部访问不了
+
+  // 封装getter方法，让外部间接访问_age属性
+  get age(): number {
+    return this._age;
+  }
+
+  // 封装setter方法，用来修改_age属性，并且在此做校验
+  set age(newAge: number) {
+    if (newAge > 18) {
+      this._age = newAge;
+    } else {
+      throw new Error("age 必须大于18岁");
+    }
+  }
+}
+let employee = new Employee();
+employee.age = 20;
+console.log(employee.age);
+```
+
+## 6.3 类的继承
+
+继承 (Inheritance) 是一种联结类与类的层次模型。指的是一个类（称为子类、子接口）继承另外的一个类（称为父类、父接口）的功能，并可以增加它自己的新功能的能力，继承是类与类或者接口与接口之间最常见的关系。
+
+在 TypeScript 中， 我们可以通过 <font color="red">extends</font> 关键词实现继承：
+
+```js
+// 创建动物类
+class Animal {
+  name: string; // 实例属性
+  constructor(name: string) {
+    this.name = name;
+  }
+  say() {
+    console.log("Animal say");
+  }
+}
+// 创建狗类，去继承动物类
+class Dog extends Animal {
+  constructor(name: string) {
+    super(name); // 通过父级的构造函数实现自己的功能
+  }
+
+  say() {
+    super.say(); // 调用父级的方法
+    console.log("Dog say");
+  }
+}
+let dog = new Dog("小狗");
+dog.say();
+```
+
+# 7. TypeScript 泛型
+
+在像 C# 和 Java 这样的语言中，可以使用泛型来创建可重用的组件，一个组件可以支持多种类型的数据。 这样用户就可以以自己的数据类型来使用组件。
+
+设计泛型的关键目的是在成员之间提供有意义的约束，这些成员可以是：类的实例成员、类的方法、函数参数和函数返回值。
+
+泛型（Generics）是允许同一个函数接受不同类型参数的一种模板。相比于使用 any 类型，使用泛型来创建可复用的组件要更好，因为泛型会保留参数类型。
+
+## 7.1 泛型接口

@@ -964,10 +964,196 @@ for (const item of todos) {
 ```
 
 ### 1.3.20 生成器 Generator 通过 Generator 实现可迭代器接口
-
 作用:
-
-- 避免异步编程中回调嵌套过深 (回调地狱)
+- 避免异步编程中回调嵌套过深 (回调地狱)    Generator+co库
 - 提供更好的异步编程解决方案
 
-## 1.4 And more
+基本用法：
+- 生成器函数会帮我们自动返回一个生成器对象，调用这个next方法才会让这个函数体执行，执行过程中一旦遇到yield关键词函数的执行就会被暂停下来，而且yield后面的值将会作为next的结果返回，继续调用next,函数将会在暂停的位置继续开始执行，周而复始一直到这个函数完全结束，那next返回的done值就会变成true
+
+特点：
+- 惰性执行，抽一下动一下   (yield+next)
+- 生成器对象也实现了iterator(可迭代)接口
+
+应用：
+- 实现自增id
+``` js
+// 生成自增id的函数     
+// 1. 声明生成器函数
+function* createIdMaker() {
+    let id = 1;
+    while (true) {
+        yield id++;
+    }
+}
+// 2. 创建生成器对象 (发号器)
+let getId = createIdMaker();
+// 3. 调用next方法生成自增id
+console.log(getId.next().value);    
+console.log(getId.next().value);    
+console.log(getId.next().value);    
+console.log(getId.next().value);    
+console.log(getId.next().value);    
+// 1
+// 2
+// 3
+// 4
+// 5
+```
+
+- 实现对象的iterator方法
+``` js
+const todos = {
+    life: ["吃饭", "睡觉", "打游戏"],
+    learn: ["语文", "数学", "英语"],
+    work: ["喝茶", "敲代码"],
+    // 1. 自己手动实现迭代接口
+    // [Symbol.iterator]: function () {
+    //     const all = [...this.life, ...this.learn, ...this.work];
+    //     let index = 0;
+    //     return {
+    //         next: function () {
+    //             return {
+    //                 value: all[index],
+    //                 done: index++ >= all.length,
+    //             };
+    //         },
+    //     };
+    // },
+    // 2. 利用generator实现iterator方法  (生成器对象内部也实现了iterator(可迭代)接口)
+    [Symbol.iterator]: function* () {
+        const all = [...this.life, ...this.learn, ...this.work];
+        for (const item of all) {
+            yield item;
+        }
+    },
+};
+for (const item of todos) {
+    console.log(item);
+}
+// 吃饭
+// 睡觉
+// 打游戏
+// 语文
+// 数学
+// 英语
+// 喝茶
+// 敲代码
+```
+- 最重要的还是为了避免异步编程中回调嵌套过深 (回调地狱)
+
+
+## 1.4 es2016(es7)
+### 1.4.1 Array.prototype.includes
+查找数组中是否存在莫个值
+
+- 以前是通过indexOf方法查找
+- 现在通过includes方法实现以下，如下所示
+``` js
+const arr = ["foo", 1, NaN, false];
+console.log(arr.indexOf(NaN));         // -1        
+console.log(arr.includes(NaN));         // true
+```
+
+通过上面得知，indexOf查找不到NaN这个数字，而includes方法可以找到
+
+### 1.4.2 指数运算符            语言本身的运算法(就像+,-,*,/一样)
+``` js
+// es2016之前的用法
+console.log(Math.pow(2, 10));       // 1024     
+// es2016的用法
+console.log(2 ** 10);               // 1024     
+```
+
+
+
+## 1.5 es2017(es8)
+
+### 1.5.1   Object.values
+将对象的值作为数组返回
+``` js
+const obj = {
+    name: "lisi",
+    age: 20
+}
+console.log(Object.values(obj));    // [ 'lisi', 20 ]
+```
+
+### 1.5.2  Object.entries   
+将对象的key和值作为数组返回
+
+``` js
+const obj = {
+    name: "lisi",
+    age: 20
+}
+console.log(Object.entries(obj));   // [ [ 'name', 'lisi' ], [ 'age', 20 ] ]
+for (const [key, value] of Object.entries(obj)) {
+    console.log(key, value);
+}
+// name lisi
+// age 20
+console.log(new Map(Object.entries(obj)));  // Map { 'name' => 'lisi', 'age' => 20 }
+```
+
+### 1.5.3 Object.getOwnPropertyDescriptors
+获取对象的装饰器对象(主要是配合es6的get,set方法去使用)
+
+``` js
+const obj1 = {
+    firstName: "li",
+    lastName: "si",
+    // 向外界提供了一个fullName的只读属性
+    get fullName() {
+        return this.firstName + " " + this.lastName;
+    }
+}
+console.log(obj1.fullName); // li si
+
+// 1. 通过这种方式拷贝的对象，无法修改拷贝对象的只读属性
+const obj2 = { ...obj1 };
+obj2.firstName = "wang";
+console.log(obj2.fullName);  // li si
+
+
+// 2. 通过Object.getOwnPropertyDescriptors实现对象的拷贝
+const descriptors = Object.getOwnPropertyDescriptors(obj1);
+const obj3 = Object.defineProperties({}, descriptors);
+obj3.firstName = "wang";
+console.log(obj3.fullName);     // wang si
+```
+
+### 1.5.4 String.prototype.padStart / String.prototype.padEnd 
+字符串填充方法
+
+使用场景
+- 为数字前面添加导0
+- 对齐我们输出字符串的长度
+
+``` js
+const books = {
+    js: 2,
+    react: 6,
+    vue: 3
+}
+for (const [name, count] of Object.entries(books)) {
+    console.log(`${name.padEnd(16, "-")} | ${count.toString().padStart(3, "0")}`);
+}
+// js-------------- | 002
+// react----------- | 006
+// vue------------- | 003
+```
+通过上面得知 用给定的字符串去填充目标字符串的开始或者结束位置，直到我们这个字符串达到指定长度为止
+
+### 1.5.5 在函数参数中添加尾逗号
+好处：
+- 如果我想重新排列数组元素中的顺序，因为我们每行都有逗号，它们格式都是一致的，调整起来就非常容易
+``` js
+const arr = [
+    1,
+    2,
+    3,
+]
+```
+
+### 1.5.6 Async / Await
