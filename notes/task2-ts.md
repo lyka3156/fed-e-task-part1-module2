@@ -10,17 +10,18 @@ https://i.51job.com/resume/standard_resume.php?lang=c&resumeid=356585555&0.16130
 
 TypeScript 提供最新的和不断发展的 JavaScript 特性，包括那些来自 2015 年的 ECMAScript 和未来的提案中的特性，比如异步功能和 Decorators，以帮助建立健壮的组件。下图显示了 TypeScript 与 ES5、ES2015 和 ES2016 之间的关系
 
-<!-- ![avatar](../images/ts和js的关系网.png) -->
 ![avatar](../images/typescript的组成.png)
 
-TypeScript的优点
-- 任何一种 JavaScript 运行环境都支持 TypeScript开发 (例如:浏览器，node，react-natvie，electron桌面应用)
-- 功能更为强大，生态也更健全，更完善。    (比flow执行的更流畅)
+TypeScript 的优点
+
+- 任何一种 JavaScript 运行环境都支持 TypeScript 开发 (例如:浏览器，node，react-natvie，electron 桌面应用)
+- 功能更为强大，生态也更健全，更完善。 (比 flow 执行的更流畅)
 - 前端领域中的第二语言
 
-TypeScript的缺点
-- 语言本身多了很多概念  (接口，泛型，枚举)
-   > 好在TypeScript 属于 渐进式 (即便我们什么都不知道，我们可以按照javascript的标准语法去使用，说白了可以把ts完全当做js去使用)
+TypeScript 的缺点
+
+- 语言本身多了很多概念 (接口，泛型，枚举)
+  > 好在 TypeScript 属于 渐进式 (即便我们什么都不知道，我们可以按照 javascript 的标准语法去使用，说白了可以把 ts 完全当做 js 去使用)
 - 项目初期，TypeScript 会增加一些成本
 
 ## 1.2 ts 与 js 的区别
@@ -91,7 +92,7 @@ let n: null = null;
 let s: symbol = Symbol.for("abc");
 ```
 
-## 2.6 Object 类型 https://juejin.im/post/5ecef4466fb9a047d5645254
+## 2.6 [Object](https://juejin.im/post/5ecef4466fb9a047d5645254) 类型
 
 ## 2.7 Array 类型
 

@@ -7,11 +7,13 @@ ECMAScript 是一门脚本语言(简称 es),通常把 ECMAScript 看做是 JavaS
 浏览器环境的 JavaScirpt
 
 - 由 ECMAScript + Web API 组成(BOM + DOM)
+
   ![avatar](../images/浏览器环境中的js.png)
 
 Node 环境的 JavaScirpt
 
 - 由 ECMAScript + Node API 组成(fs net etc...)
+
   ![avatar](../images/node环境中的js.png)
 
 JavaScript 语言本身指的就是 ECMAScript
@@ -628,9 +630,9 @@ console.log(map); // Map {}
 
 为什么会出现 symbol
 
-- 在 es6 之前，对象的属性名都是字符串，而字符串又肯能会重复的，这样会产生冲突
+- 在 es6 之前，对象的属性名都是字符串，而字符串又可能会重复的，这样会产生冲突
 
-- 现如今我们大量使用第三方模块，对会去扩展第三方模块提供的一些对象，那此时你是不知道这个对象中是否存在莫一个指定的健，你如果直接去扩展就有可能会产生冲突的问题
+- 现如今我们大量使用第三方模块，都会去扩展第三方模块提供的一些对象，那此时你是不知道这个对象中是否存在莫一个指定的健，你如果直接去扩展就有可能会产生冲突的问题
 
 - 以前解决的方式就是约定，例如变量名改为 = 模块\_变量名, 约定只是规避这个问题，并不是彻底解决这个问题， 在这个过程中有人不遵守这个问题还是会出现这个问题
 - es6 为了解决上面的问题就出现了 symbol 数据类型 (symbol 表示独一无二的值)
@@ -964,36 +966,42 @@ for (const item of todos) {
 ```
 
 ### 1.3.20 生成器 Generator 通过 Generator 实现可迭代器接口
+
 作用:
-- 避免异步编程中回调嵌套过深 (回调地狱)    Generator+co库
+
+- 避免异步编程中回调嵌套过深 (回调地狱) Generator+co 库
 - 提供更好的异步编程解决方案
 
 基本用法：
-- 生成器函数会帮我们自动返回一个生成器对象，调用这个next方法才会让这个函数体执行，执行过程中一旦遇到yield关键词函数的执行就会被暂停下来，而且yield后面的值将会作为next的结果返回，继续调用next,函数将会在暂停的位置继续开始执行，周而复始一直到这个函数完全结束，那next返回的done值就会变成true
+
+- 生成器函数会帮我们自动返回一个生成器对象，调用这个 next 方法才会让这个函数体执行，执行过程中一旦遇到 yield 关键词函数的执行就会被暂停下来，而且 yield 后面的值将会作为 next 的结果返回，继续调用 next,函数将会在暂停的位置继续开始执行，周而复始一直到这个函数完全结束，那 next 返回的 done 值就会变成 true
 
 特点：
-- 惰性执行，抽一下动一下   (yield+next)
-- 生成器对象也实现了iterator(可迭代)接口
+
+- 惰性执行，抽一下动一下 (yield+next)
+- 生成器对象也实现了 iterator(可迭代)接口
 
 应用：
-- 实现自增id
-``` js
-// 生成自增id的函数     
+
+- 实现自增 id
+
+```js
+// 生成自增id的函数
 // 1. 声明生成器函数
 function* createIdMaker() {
-    let id = 1;
-    while (true) {
-        yield id++;
-    }
+  let id = 1;
+  while (true) {
+    yield id++;
+  }
 }
 // 2. 创建生成器对象 (发号器)
 let getId = createIdMaker();
 // 3. 调用next方法生成自增id
-console.log(getId.next().value);    
-console.log(getId.next().value);    
-console.log(getId.next().value);    
-console.log(getId.next().value);    
-console.log(getId.next().value);    
+console.log(getId.next().value);
+console.log(getId.next().value);
+console.log(getId.next().value);
+console.log(getId.next().value);
+console.log(getId.next().value);
 // 1
 // 2
 // 3
@@ -1001,35 +1009,36 @@ console.log(getId.next().value);
 // 5
 ```
 
-- 实现对象的iterator方法
-``` js
+- 实现对象的 iterator 方法
+
+```js
 const todos = {
-    life: ["吃饭", "睡觉", "打游戏"],
-    learn: ["语文", "数学", "英语"],
-    work: ["喝茶", "敲代码"],
-    // 1. 自己手动实现迭代接口
-    // [Symbol.iterator]: function () {
-    //     const all = [...this.life, ...this.learn, ...this.work];
-    //     let index = 0;
-    //     return {
-    //         next: function () {
-    //             return {
-    //                 value: all[index],
-    //                 done: index++ >= all.length,
-    //             };
-    //         },
-    //     };
-    // },
-    // 2. 利用generator实现iterator方法  (生成器对象内部也实现了iterator(可迭代)接口)
-    [Symbol.iterator]: function* () {
-        const all = [...this.life, ...this.learn, ...this.work];
-        for (const item of all) {
-            yield item;
-        }
-    },
+  life: ["吃饭", "睡觉", "打游戏"],
+  learn: ["语文", "数学", "英语"],
+  work: ["喝茶", "敲代码"],
+  // 1. 自己手动实现迭代接口
+  // [Symbol.iterator]: function () {
+  //     const all = [...this.life, ...this.learn, ...this.work];
+  //     let index = 0;
+  //     return {
+  //         next: function () {
+  //             return {
+  //                 value: all[index],
+  //                 done: index++ >= all.length,
+  //             };
+  //         },
+  //     };
+  // },
+  // 2. 利用generator实现iterator方法  (生成器对象内部也实现了iterator(可迭代)接口)
+  [Symbol.iterator]: function* () {
+    const all = [...this.life, ...this.learn, ...this.work];
+    for (const item of all) {
+      yield item;
+    }
+  },
 };
 for (const item of todos) {
-    console.log(item);
+  console.log(item);
 }
 // 吃饭
 // 睡觉
@@ -1040,120 +1049,127 @@ for (const item of todos) {
 // 喝茶
 // 敲代码
 ```
+
 - 最重要的还是为了避免异步编程中回调嵌套过深 (回调地狱)
 
-
 ## 1.4 es2016(es7)
+
 ### 1.4.1 Array.prototype.includes
+
 查找数组中是否存在莫个值
 
-- 以前是通过indexOf方法查找
-- 现在通过includes方法实现以下，如下所示
-``` js
+- 以前是通过 indexOf 方法查找
+- 现在通过 includes 方法实现以下，如下所示
+
+```js
 const arr = ["foo", 1, NaN, false];
-console.log(arr.indexOf(NaN));         // -1        
-console.log(arr.includes(NaN));         // true
+console.log(arr.indexOf(NaN)); // -1
+console.log(arr.includes(NaN)); // true
 ```
 
-通过上面得知，indexOf查找不到NaN这个数字，而includes方法可以找到
+通过上面得知，indexOf 查找不到 NaN 这个数字，而 includes 方法可以找到
 
-### 1.4.2 指数运算符            语言本身的运算法(就像+,-,*,/一样)
-``` js
+### 1.4.2 指数运算符 语言本身的运算法(就像+,-,\*,/一样)
+
+```js
 // es2016之前的用法
-console.log(Math.pow(2, 10));       // 1024     
+console.log(Math.pow(2, 10)); // 1024
 // es2016的用法
-console.log(2 ** 10);               // 1024     
+console.log(2 ** 10); // 1024
 ```
-
-
 
 ## 1.5 es2017(es8)
 
-### 1.5.1   Object.values
+### 1.5.1 Object.values
+
 将对象的值作为数组返回
-``` js
+
+```js
 const obj = {
-    name: "lisi",
-    age: 20
-}
-console.log(Object.values(obj));    // [ 'lisi', 20 ]
+  name: "lisi",
+  age: 20,
+};
+console.log(Object.values(obj)); // [ 'lisi', 20 ]
 ```
 
-### 1.5.2  Object.entries   
-将对象的key和值作为数组返回
+### 1.5.2 Object.entries
 
-``` js
+将对象的 key 和值作为数组返回
+
+```js
 const obj = {
-    name: "lisi",
-    age: 20
-}
-console.log(Object.entries(obj));   // [ [ 'name', 'lisi' ], [ 'age', 20 ] ]
+  name: "lisi",
+  age: 20,
+};
+console.log(Object.entries(obj)); // [ [ 'name', 'lisi' ], [ 'age', 20 ] ]
 for (const [key, value] of Object.entries(obj)) {
-    console.log(key, value);
+  console.log(key, value);
 }
 // name lisi
 // age 20
-console.log(new Map(Object.entries(obj)));  // Map { 'name' => 'lisi', 'age' => 20 }
+console.log(new Map(Object.entries(obj))); // Map { 'name' => 'lisi', 'age' => 20 }
 ```
 
 ### 1.5.3 Object.getOwnPropertyDescriptors
-获取对象的装饰器对象(主要是配合es6的get,set方法去使用)
 
-``` js
+获取对象的装饰器对象(主要是配合 es6 的 get,set 方法去使用)
+
+```js
 const obj1 = {
-    firstName: "li",
-    lastName: "si",
-    // 向外界提供了一个fullName的只读属性
-    get fullName() {
-        return this.firstName + " " + this.lastName;
-    }
-}
+  firstName: "li",
+  lastName: "si",
+  // 向外界提供了一个fullName的只读属性
+  get fullName() {
+    return this.firstName + " " + this.lastName;
+  },
+};
 console.log(obj1.fullName); // li si
 
 // 1. 通过这种方式拷贝的对象，无法修改拷贝对象的只读属性
 const obj2 = { ...obj1 };
 obj2.firstName = "wang";
-console.log(obj2.fullName);  // li si
-
+console.log(obj2.fullName); // li si
 
 // 2. 通过Object.getOwnPropertyDescriptors实现对象的拷贝
 const descriptors = Object.getOwnPropertyDescriptors(obj1);
 const obj3 = Object.defineProperties({}, descriptors);
 obj3.firstName = "wang";
-console.log(obj3.fullName);     // wang si
+console.log(obj3.fullName); // wang si
 ```
 
-### 1.5.4 String.prototype.padStart / String.prototype.padEnd 
+### 1.5.4 String.prototype.padStart / String.prototype.padEnd
+
 字符串填充方法
 
 使用场景
-- 为数字前面添加导0
+
+- 为数字前面添加导 0
 - 对齐我们输出字符串的长度
 
-``` js
+```js
 const books = {
-    js: 2,
-    react: 6,
-    vue: 3
-}
+  js: 2,
+  react: 6,
+  vue: 3,
+};
 for (const [name, count] of Object.entries(books)) {
-    console.log(`${name.padEnd(16, "-")} | ${count.toString().padStart(3, "0")}`);
+  console.log(`${name.padEnd(16, "-")} | ${count.toString().padStart(3, "0")}`);
 }
 // js-------------- | 002
 // react----------- | 006
 // vue------------- | 003
 ```
+
 通过上面得知 用给定的字符串去填充目标字符串的开始或者结束位置，直到我们这个字符串达到指定长度为止
 
 ### 1.5.5 在函数参数中添加尾逗号
+
 好处：
+
 - 如果我想重新排列数组元素中的顺序，因为我们每行都有逗号，它们格式都是一致的，调整起来就非常容易
-``` js
-const arr = [
-    1,
-    2,
-    3,
-]
+
+```js
+const arr = [1, 2, 3];
 ```
 
 ### 1.5.6 Async / Await
