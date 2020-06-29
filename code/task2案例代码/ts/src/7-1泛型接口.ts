@@ -1,10 +1,13 @@
 export = {}; // 模块作用域，防止变量冲突
 
-// interface GenericIdentityFn<T> {
-//   (arg: T): T;
-// }
+// 7.2 泛型接口
 
-// let generaic: GenericIdentityFn<string> = {
-//   // age: string
-//   arg:string:"123"
-// };
+interface GenericIdentityFn<T> {
+  name: T;
+}
+
+let generaic: GenericIdentityFn<string> = {
+  name: "lisi",
+};
+
+console.log(generaic);

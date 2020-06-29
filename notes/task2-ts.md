@@ -1,6 +1,6 @@
-# 1. ts 的学习大纲 https://juejin.im/post/5edd8ad8f265da76fc45362c#heading-28
+# 1. ts 的学习大纲
 
-https://i.51job.com/resume/standard_resume.php?lang=c&resumeid=356585555&0.16130746229826243
+[更多 TS 学习](https://juejin.im/post/5edd8ad8f265da76fc45362c#heading-28)
 
 ![avatar](../images/ts学习大纲.png)
 
@@ -88,11 +88,26 @@ let n: null = null;
 
 ## 2.5 Symbol 类型
 
+- Symbol 是 ES2015 标准中定义的成员，
+- 使用它的前提是必须确保有对应的 ES2015 标准库引用
+- 也就是 tsconfig.json 中的 lib 选项必须包含 ES2015
+
 ```js
 let s: symbol = Symbol.for("abc");
 ```
 
 ## 2.6 [Object](https://juejin.im/post/5ecef4466fb9a047d5645254) 类型
+
+- object 类型是指除了原始类型以外的其它类型
+- 如果需要明确限制对象类型，则应该使用类型对象字面量的语法，或者是「接口」
+
+```js
+// object 类型是指除了原始类型以外的其它类型
+const foo: object = function () {}; // [] // {}
+
+// 如果需要明确限制对象类型，则应该使用这种类型对象字面量的语法，或者是「接口」
+const obj: { foo: number, bar: string } = { foo: 123, bar: "string" };
+```
 
 ## 2.7 Array 类型
 
@@ -715,6 +730,65 @@ let dog = new Dog("小狗");
 dog.say();
 ```
 
+## 6.4 类属性的修饰符
+
+属性修饰符类型
+
+- public 哪里都能访问 (默认不写就是 public)
+- private 只能当前类访问
+- protected 当前类和子类可以访问
+
+```js
+// 父类
+class Person {
+  public name: string; //  哪里都能访问(默认不写就是 public)
+  protected age: number; // 当前类和子类可以访问
+  private gener: string; // 只能当前类访问
+
+  constructor(name: string, age: number, gener: string) {
+    this.name = name;
+    this.age = age;
+    this.gener = gener;
+  }
+}
+
+// 子类
+class Student extends Person {
+  constructor(name: string, age: number, gener: string) {
+    super(name, age, gener);
+    console.log(this.age); // 20       protected
+    // console.log(this.gener);    // 编译报错  private 关键词只能在声明此属性的类访问
+  }
+}
+
+const p1 = new Person("tom", 20, "男");
+console.log(p1.name); // tom             public
+// console.log(p1.age); // 编译报错         protected
+// console.log(p1.gener); // 编译报错       private
+
+```
+
+## 6.5 类的只读属性
+
+```js
+class Person {
+  public name: string // = 'init name'
+  private age: number
+  // 只读成员
+  protected readonly gender: boolean
+
+  constructor (name: string, age: number) {
+    this.name = name
+    this.age = age
+    this.gender = true
+  }
+}
+
+const tom = new Person('tom', 20)
+console.log(tom.name)
+// tom.gender = false     // 编译报错   readonly修饰的属性只能读不能写
+```
+
 # 7. TypeScript 泛型
 
 在像 C# 和 Java 这样的语言中，可以使用泛型来创建可重用的组件，一个组件可以支持多种类型的数据。 这样用户就可以以自己的数据类型来使用组件。
@@ -724,3 +798,100 @@ dog.say();
 泛型（Generics）是允许同一个函数接受不同类型参数的一种模板。相比于使用 any 类型，使用泛型来创建可复用的组件要更好，因为泛型会保留参数类型。
 
 ## 7.1 泛型接口
+
+```js
+interface GenericIdentityFn<T> {
+  name: T;
+}
+
+let generaic: GenericIdentityFn<string> = {
+  name: "lisi",
+};
+
+console.log(generaic);
+```
+
+## 7.2 泛型类
+
+```js
+
+// 声明一个通用的泛型类
+class GenericNumber<T> {
+  // 根据传递的T类型来定义字段的类型
+  zeroValue: T;
+  add: (x: T, y: T) => T;
+}
+
+// 实例化一个number的泛型类
+let myGenericNumber = new GenericNumber<number>();
+myGenericNumber.zeroValue = 0;
+myGenericNumber.add = function (x, y) {
+  return x + y;
+};
+
+console.log(myGenericNumber.zeroValue); // 0
+console.log(myGenericNumber.add(1, 2)); // 3
+```
+
+## 7.3 泛型的应用
+
+通过泛型可以动态设置自己想要的类型的功能，如下图所示
+
+```js
+// 1. 创建一个长度固定的number类型的数组，并且填充value值
+function createNumberArray(length: number, value: number): number[] {
+  const arr = Array < number > length.fill(value);
+  return arr;
+}
+// 2. 创建一个长度固定的string类型的数组，并且填充value值
+function createStringArray(length: number, value: string): string[] {
+  const arr = Array < string > length.fill(value);
+  return arr;
+}
+
+// 3. 通过泛型实现上面两种功能
+function createArray<T>(length: number, value: T): T[] {
+  const arr = Array < T > length.fill(value);
+  return arr;
+}
+const res1 = createNumberArray(3, 100);
+console.log(res1); // [100, 100, 100]
+const res2 = createArray < string > (3, "foo");
+console.log(res2); // ["foo", "foo", "foo"]
+```
+
+# 8. abstract 抽象类
+
+抽象类的特点
+
+- 抽象类无法实例化
+- 抽象类和普通类一样可以被继承
+
+抽象方法的特点
+
+- 只有声明没有实现，只能通过继承的子类去实现此方法
+- 继承带有抽象方法的抽象类必须重写这个抽象方法，不然会编译报错
+- 抽象方法只能在抽象类中声明
+
+```js
+abstract class Animal {
+  eat(food: string): void {
+    console.log(`吃: ${food}`);
+  }
+  // 抽象方法: 只有声明没有实现，只能通过继承的子类去实现此方法
+  abstract run(distance: number): void;
+}
+
+class Dog extends Animal {
+  // 抽象方法必须重写，不然会编译报错
+  run(distance: number): void {
+    console.log("四脚爬行", distance);
+  }
+}
+
+// let a1 = new Animal();       // 无法创建抽象类的实例
+const d = new Dog();
+d.eat("狗粮"); // 吃: 狗粮
+d.run(100); // 四脚爬行 10
+
+```
